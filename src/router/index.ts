@@ -11,7 +11,7 @@ const constantRoutes: RouteRecordRaw[] = [
 		component: () => import('@/views/login/loginIndex.vue')
 	},
 	{
-		path: '/home',
+		path: '/workbench',
 		name: 'Home',
 		meta: { name: '首页' },
 		component: () => import('@/layouts/index.vue'),
@@ -23,7 +23,14 @@ const constantRoutes: RouteRecordRaw[] = [
 				component: () => import('@/views/workbench/workbench.vue')
 			}
 		]
+	},
+	{
+		path: '/:pathMatch(.*)*',
+		name: 'NotFound',
+		// @ts-ignore
+		component: () => import('@/views/error/404.vue')
 	}
+	
 ]
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),

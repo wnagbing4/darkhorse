@@ -9,7 +9,7 @@ export const useAuthStore = defineStore(
 		const info = ref<any | null>(null)
 		const menuList = ref<any[] | null>(null)
 		const isCollapse = ref<boolean>(false)
-
+		const numData = ref()
 		// 设置token
 		const setToken = (value: string) => {
 			token.value = value
@@ -65,13 +65,14 @@ export const useAuthStore = defineStore(
 			getMenu,
 			menuList,
 			isCollapse,
-			setCollapse
+			setCollapse,
+			numData
 		}
 	},
 	{
 		persist: {
 			storage: localStorage,
-			paths: ['token', 'info']
+			paths: ['token', 'info','numData']
 		}
 	}
 )
