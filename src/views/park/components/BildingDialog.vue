@@ -1,13 +1,5 @@
-<!--
- * @Author: 3396515303@qq.com 12267007+wangbing56@user.noreply.gitee.com
- * @Date: 2024-06-18 20:27:10
- * @LastEditors: 3396515303@qq.com 12267007+wangbing56@user.noreply.gitee.com
- * @LastEditTime: 2024-06-19 08:56:38
- * @FilePath: \Dark_horse\src\views\park\components\BildingDialog.vue
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
--->
 <template>
-  <el-dialog v-model="dialogFormVisible" title="添加楼宇" width="500">
+  <el-dialog v-model="dialogFormVisible" :title="title" width="500">
     <el-form
       ref="ruleFormRef"
       style="max-width: 600px; height: 360px; padding: 30px"
@@ -29,7 +21,7 @@
           style="max-width: 600px"
           placeholder="请输入在管面积"
         >
-          <template #append>平方米</template>
+          <template #append>㎡</template>
         </el-input>
       </el-form-item>
 
@@ -54,7 +46,8 @@
 <script lang="ts" setup>
 import { reactive, ref } from "vue";
 import type { FormInstance, FormRules } from "element-plus";
-import { buildingApi, AddApi } from "@/api/test";
+import { editApi, AddApi } from "@/api/test";
+import { ElMessage } from "element-plus";
 const dialogFormVisible = ref(false);
 
 export type EmptyObject = {
@@ -83,37 +76,108 @@ let ruleForm = ref({
   propertyFeePrice: 0,
 });
 const rules = reactive<FormRules<EmptyObject>>({
-  name: [{ required: true, message: "请输入楼宇名称", trigger: "blur" }],
-  floors: [{ required: true, message: "请输入层数", trigger: "blur" }],
-  area: [{ required: true, message: "请输入建筑面积", trigger: "blur" }],
-  propertyFeePrice: [{ required: true, message: "请输入物业费", trigger: "blur" }],
+  name: [{ required: true, message: "请输入楼宇名称", trigger: "change" }],
+  floors: [
+    { required: true, message: "请输入层数", trigger: "change" },
+
+    {
+      validator: (rule, value, callback) => {
+        const num = parseInt(value, 10);
+        if (num >= 1 && num <= 20) {
+          callback();
+        } else {
+          callback(new Error("楼层最大值为20"));
+        }
+      },
+      trigger: "blur",
+    },
+  ],
+  area: [{ required: true, message: "请输入建筑面积", trigger: "change" }],
+  propertyFeePrice: [{ required: true, message: "请输入物业费", trigger: "change" }],
 });
 const ruleFormRef = ref();
+const title = ref();
+const type = ref();
+const id = ref();
+const openDialog = (obj: any) => {
+  ruleForm.value.area = 0;
+          ruleForm.value.floors = 0;
+          ruleForm.value.name = "";
+          ruleForm.value.propertyFeePrice = 0;
+  dialogFormVisible.value = true;
+  title.value = obj.title;
+  type.value = obj.type;
 
-const openDialog=()=>{
-    dialogFormVisible.value = true;
-}
-const closeDialog=()=>{
-    dialogFormVisible.value = false;
-}
+  if (obj.type == "edit") {
+    console.log(obj);
+
+    const form = obj.row;
+    ruleForm.value.name = form.name;
+    ruleForm.value.area = form.area;
+    ruleForm.value.floors = form.floors;
+    ruleForm.value.propertyFeePrice = form.propertyFeePrice;
+    id.value = form.id;
+  }
+};
+
+const closeDialog = () => {
+  dialogFormVisible.value = false;
+  ruleForm.value.area = 0;
+  ruleForm.value.floors = 0;
+  ruleForm.value.name = "";
+  ruleForm.value.propertyFeePrice = 0;
+};
 defineExpose({
   openDialog,
-  closeDialog
-})
-    
+  closeDialog,
+});
+const emmits = defineEmits(["addGetList"]);
 //添加的方法
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid: any, fields: any) => {
     if (valid) {
-      AddApi(ruleForm.value).then((res) => {
-        console.log(res);
-      });
-      dialogFormVisible.value = false;
-    //   builist();
-      console.log("submit!");
-    } else {
-      console.log("error submit!", fields);
+      if (type.value == "add") {
+        AddApi(ruleForm.value).then((res) => {
+          if (res.code == 10000) {
+            ElMessage({
+              message: res.msg,
+              type: "success",
+            });
+            dialogFormVisible.value = false;
+            emmits("addGetList");
+          }
+          ruleForm.value.area = 0;
+          ruleForm.value.floors = 0;
+          ruleForm.value.name = "";
+          ruleForm.value.propertyFeePrice = 0;
+          console.log(res);
+        });
+      } else {
+        console.log(id.value, "idoid");
+
+        editApi({
+          area: ruleForm.value.area,
+          floors: ruleForm.value.floors,
+          id: id.value,
+          name: ruleForm.value.name,
+          propertyFeePrice: ruleForm.value.propertyFeePrice,
+        }).then((res: any) => {
+          if (res.code == 10000) {
+            ElMessage({
+              message: res.msg,
+              type: "success",
+            });
+            dialogFormVisible.value = false;
+            emmits("addGetList");
+          }
+          ruleForm.value.area = 0;
+          ruleForm.value.floors = 0;
+          ruleForm.value.name = "";
+          ruleForm.value.propertyFeePrice = 0;
+          console.log(res, "editedit");
+        });
+      }
     }
   });
 };

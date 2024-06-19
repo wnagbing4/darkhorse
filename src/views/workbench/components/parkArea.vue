@@ -4,19 +4,19 @@
     <div class="bottom_box">
       <div class="first">
         <span style="color: #90a1c4">年度累计收费（元）</span>
-        <h4>{{ store.numData.annualIncome }}</h4>
+        <h4>{{ store.numData.annualIncome||'' }}</h4>
       </div>
       <div class="second">
-        <span>年度累计收费（元）</span>
-        <h4>{{ store.numData.chargePoleTotal }}</h4>
+        <span>年度累计收费（元）</span>   
+        <h4>{{ store.numData.chargePoleTotal||'' }}</h4>
       </div>
       <div class="third">
         <span>年度累计收费（元）</span>
-        <h4>{{ store.numData.enterpriseTotal }}</h4>
+        <h4>{{ store.numData.enterpriseTotal||'' }}</h4>
       </div>
       <div class="four">
         <span>年度累计收费（元）</span>
-        <h4>{{ store.numData.monthCardTotal }}</h4>
+        <h4>{{ store.numData.monthCardTotal ||''}}</h4>
       </div>
     </div>
   </div>

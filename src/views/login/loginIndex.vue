@@ -70,7 +70,7 @@ const checkCapslock = () => {
             message:'登录成功',
             type: "success",
           });
-          router.push("/");
+          router.push("/workbench");
         }
       } catch (e) {
         console.log(e);

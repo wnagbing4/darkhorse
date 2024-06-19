@@ -1,5 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted, reactive, computed, onUnmounted, watch, onActivated, nextTick } from "vue";
+import {
+  ref,
+  onMounted,
+  reactive,
+  computed,
+  onUnmounted,
+  watch,
+  onActivated,
+  nextTick,
+} from "vue";
 const domRef = ref();
 const paginationRef = ref();
 const headerRef = ref();
@@ -42,9 +51,6 @@ const props = defineProps({
 });
 
 const state = reactive({
-  // pageIndex: props.page.pageIndex,
-  // pageSize: props.page.pageSize,
-  // totalRecord: props.page.totalRecord,
   height: 0,
   loading: true,
 });
@@ -65,8 +71,12 @@ const currentChangeHandle = (val: number) => {
 onActivated(() => {});
 const init = () => {
   nextTick(() => {
-    state.height = domRef.value.offsetHeight - paginationRef.value.$el.offsetHeight - headerRef.value.offsetHeight - 24;
-  })
+    state.height =
+      domRef.value.offsetHeight -
+      paginationRef.value.$el.offsetHeight -
+      headerRef.value.offsetHeight -
+      24;
+  });
 };
 const userInput = ref<number>();
 const jumper = computed(() => userInput.value ?? props.page.pageIndex);
@@ -85,10 +95,12 @@ defineExpose({
 });
 
 onUnmounted(() => {});
-watch(() => domRef.value, (e) => {
-  init();
-});
-
+watch(
+  () => domRef.value,
+  (e) => {
+    init();
+  }
+);
 </script>
 
 <template>
@@ -99,10 +111,17 @@ watch(() => domRef.value, (e) => {
     <el-table
       ref="tableRef"
       :data="props.data"
-       v-loading="state.loading"
+      v-loading="state.loading"
       @selection-change="selectionChangeHandle"
     >
-      <el-table-column align="center" v-if="props.selection" type="selection" width="50" fixed />
+      <el-table-column
+        align="center"
+        v-if="props.selection"
+        type="selection"
+        width="50"
+        fixed
+      />
+      
       <el-table-column label="序号" align="center" width="75" fixed>
         <template #default="scope">
           <span ref="indexRef">
@@ -123,20 +142,12 @@ watch(() => domRef.value, (e) => {
       @size-change="sizeChangeHandle"
       @current-change="currentChangeHandle"
     >
+     
       <template #default>
         <span class="el-pagination__jump">
           <span class="el-pagination__goto">跳转</span>
-          <!-- {{ props.page.totalPage }}
-          <el-input
-            :model-value="jumper"
-            :min="1"
-            :max="props.page.totalPage"
-            type="number"
-            class="el-pagination__editor el-pagination__in-pagination"
-            @update:model-value="(val: number | string) => userInput = +val"
-          /> -->
           <el-input-number
-            :model-value="jumper" 
+            :model-value="jumper"
             :min="1"
             :max="props.page.totalPage === 0 ? 1 : props.page.totalPage"
             :controls="false"
@@ -144,7 +155,9 @@ watch(() => domRef.value, (e) => {
             @update:model-value="(val: number) => userInput = +val"
           />
           <span class="el-pagination__classifier">页</span>
-          <span @click="jumperChangeHandle" class="el-pagination__jumper-button">跳转</span>
+          <span @click="jumperChangeHandle" class="el-pagination__jumper-button"
+            >跳转</span
+          >
         </span>
       </template>
     </el-pagination>
